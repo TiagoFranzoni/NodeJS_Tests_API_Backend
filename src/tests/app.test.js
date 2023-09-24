@@ -51,13 +51,13 @@ describe("Testes API", () => {
         expect(response.body.length).toBe(2);
         expect(response.body).toEqual(expect.arrayContaining([
             {
-                _id: `${user1._id}`,
+                id: `${user1._id}`,
                 name: 'name_one',
                 email: 'name_one@email.com',
                 password: 'password_name_one'
             },
             {
-                _id: `${user2._id}`,
+                id: `${user2._id}`,
                 name: 'name_two',
                 email: 'name_two@email.com',
                 password: 'password_name_two'

@@ -1,19 +1,30 @@
 const express = require("express");
 const Container = require("./container");
 const mongo = require('mongodb');
+const cors = require("cors");
 
 const app = express();
 
 const container = new Container;
 app.set("container", container);
 app.use(express.json());
+app.use(cors({
+    exposedHeaders: ["Content-Range"],
+}));
+
+const normalizePk = (user) => {
+    user.id = user._id;
+    delete user._id;
+    return user;
+}
 
 
 app.get("/users", async(req, res) => {
     try {
         const repository = await container.getRepository();
         const events = await repository.findAll();
-        res.status(200).json(events);
+        res.setHeader("Content-Range", 100);
+        res.status(200).json(events.map(normalizePk));
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -23,7 +34,7 @@ app.get("/users", async(req, res) => {
 app.post("/users", async(req, res) => {
     const repository = await container.getRepository();
     const event = await repository.create(req.body);
-    res.status(201).json(event);
+    res.status(201).json(normalizePk(event));
 })
 
 
@@ -34,7 +45,7 @@ app.get("/users/:id", async(req, res) => {
     if (user === null) {
         res.status(404).json({ message: 'Usuário não encontrado' });
     }else{
-        res.status(200).json(user);
+        res.status(200).json(normalizePk(user));
     }
 })
 
@@ -47,7 +58,7 @@ app.put("/users/:id", async(req, res) => {
         res.status(404).json({ message: 'Usuário não encontrado' });
     }else {
         const newEvent = await repository.find(req.params.id);
-        res.status(200).json(newEvent);
+        res.status(200).json(normalizePk(newEvent));
     }
 })
 
