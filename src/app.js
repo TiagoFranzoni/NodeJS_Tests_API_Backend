@@ -73,5 +73,14 @@ app.delete("/users/:id", async(req, res) => {
     }
 })
 
+app.delete("/users", async(req, res) => {
+    const repository = await container.getRepository();
+    await repository.deleteAll();
+    res.status(204).json();
+})
+
+
+
+
 
 module.exports = app
